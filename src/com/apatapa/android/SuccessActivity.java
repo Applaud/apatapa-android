@@ -1,6 +1,6 @@
 package com.apatapa.android;
 
-import com.example.secondapp.R;
+import com.apatapa.android.R;
 
 import android.app.Activity;
 import android.os.Bundle;

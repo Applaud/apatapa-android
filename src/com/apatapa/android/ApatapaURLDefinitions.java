@@ -9,4 +9,7 @@ public interface ApatapaURLDefinitions {
 	/** Sites within the backend. Don't forget the leading and trailing '/' **/
 	// Where to go log in
 	public static final String LOGIN_URL = "/accounts/mobilelogin/";
+	
+	// Where to download possible businesses based on location
+	public static final String WHEREAMI_URL = "/whereami/";
 }

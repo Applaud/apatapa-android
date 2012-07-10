@@ -28,9 +28,19 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 
 
 	// Make a POST request to backend to check username/password
-	private static HttpClient http = new DefaultHttpClient();
-	public static String SESSION_TOKEN;
+	private static HttpClient http = new DefaultHttpClient();	// For making HTTP requests
+	public static String SESSION_TOKEN;	// Stores our session token
 	
+	/**
+	 * login
+	 * 
+	 * Logs in the user.
+	 * 
+	 * @param username The username
+	 * @param password The password
+	 * 
+	 * @return true if successful, false otherwise
+	 */
 	public static boolean login(String username, String password) {
 		String login = SERVER_URL + LOGIN_URL;
 		HttpPost postRequest = new HttpPost(login);

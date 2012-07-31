@@ -17,7 +17,7 @@ import android.os.Bundle;
  *
  */
 
-public class BusinessLocationsTracker {
+public class BusinessLocationsTracker implements ApatapaURLDefinitions {
 	
 	// How often we want to update location.
 	private static final int TWO_MINUTES = 1000 * 60 * 2;

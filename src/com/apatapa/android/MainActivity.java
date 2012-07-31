@@ -2,14 +2,13 @@ package com.apatapa.android;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-
-import com.apatapa.android.R;
 
 public class MainActivity extends Activity implements ApatapaURLDefinitions {
 
@@ -38,22 +37,38 @@ public class MainActivity extends Activity implements ApatapaURLDefinitions {
      * What happens when the "OK" button is clicked at the login screen.
      */
     public void loginButtonClicked(View view) {
-    	ProgressBar loginProgress = (ProgressBar)findViewById(R.id.loginProgress);
+    	new LoginProgress().execute();
+    }
+    
+    private class LoginProgress extends AsyncTask<Void, Void, Boolean> {
+    	ProgressDialog loadingDialog;
 
-    	EditText usernameField = (EditText)findViewById(R.id.usernameField);
-		String username = usernameField.getText().toString();
-		EditText passwordField = (EditText)findViewById(R.id.passwordField);
-		String password = passwordField.getText().toString();
+    	protected void onPreExecute() {
+    		loadingDialog = new ProgressDialog(MainActivity.this);
+    		loadingDialog.setTitle("Apatapa");
+    		loadingDialog.setMessage("Logging in...");
+    		loadingDialog.setIndeterminate(true);
+    		loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+    		loadingDialog.show();
+    	}
+    	
+    	protected void onPostExecute(Boolean success) {
+    		loadingDialog.cancel();
+    		
+    		if ( success ) {
+    			Intent successIntent = new Intent(MainActivity.this, SuccessActivity.class); 
+    			startActivity( successIntent );
+    		}
+    	}
+    	
+		@Override
+		protected Boolean doInBackground(Void...voids) {
+			EditText usernameField = (EditText)findViewById(R.id.usernameField);
+			String username = usernameField.getText().toString();
+			EditText passwordField = (EditText)findViewById(R.id.passwordField);
+			String password = passwordField.getText().toString();
 
-		// Animate the progress bar to show that we're actually doing something
-		loginProgress.setVisibility(View.VISIBLE);
-		
-		// Tell the connection manager to log us in.
-		if ( ConnectionManager.login(username, password)) {
-			Intent successIntent = new Intent(this, SuccessActivity.class);
-			startActivity( successIntent );
+			return ConnectionManager.login(username, password);
 		}
-		
-		loginProgress.setVisibility(View.GONE);
     }
 }

@@ -25,7 +25,8 @@ import org.apache.http.util.EntityUtils;
  */
 
 public class ConnectionManager implements ApatapaURLDefinitions {
-
+	
+	
 
 	// Make a POST request to backend to check username/password
 	private static HttpClient http = new DefaultHttpClient();	// For making HTTP requests
@@ -44,7 +45,7 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 	public static boolean login(String username, String password) {
 		String login = SERVER_URL + LOGIN_URL;
 		HttpPost postRequest = new HttpPost(login);
-
+		
 		// The response from the server
 		HttpResponse response = null;
 		try {
@@ -52,7 +53,7 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 			postData.add(new BasicNameValuePair("username", username));
 			postData.add(new BasicNameValuePair("password", password));
 			postRequest.setEntity(new UrlEncodedFormEntity(postData));
-
+			
 			response = http.execute(postRequest);
 		} catch ( ClientProtocolException e ) {
 			System.err.println("ClientProtocolException");

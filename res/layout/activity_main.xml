@@ -58,12 +58,4 @@
         android:text="@string/login_button_text"
         android:onClick="loginButtonClicked" />
 
-    <ProgressBar
-        android:id="@+id/loginProgress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/messageText"
-        android:visibility="invisible" />
-
 </RelativeLayout>

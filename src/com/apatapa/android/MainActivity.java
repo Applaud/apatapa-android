@@ -3,6 +3,7 @@ package com.apatapa.android;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -15,19 +16,26 @@ public class MainActivity extends Activity implements ApatapaURLDefinitions {
 	
 	// Stored for the rest of the app to see.
 	public static double latitude, longitude;
-	
+	// Application context
+	private static Context applicationContext;
+
 	// Used to retrieve the user's location. Results are stored
 	// statically in this class.
-	LocationHelper locationHelper;
-	LocationHelper.LocationResult locationResult;
+	static LocationHelper locationHelper;
+	static LocationHelper.LocationResult locationResult;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        applicationContext = this.getApplicationContext();
         
         // Setup location request. Find the user's location before they're
         // even logged in.
+        updateLocation();
+    }
+    
+    public static void updateLocation(final Callback callback) {
         locationHelper = new LocationHelper();
         locationResult = new LocationHelper.LocationResult() {
 			
@@ -35,9 +43,16 @@ public class MainActivity extends Activity implements ApatapaURLDefinitions {
 			public void gotLocation(Location location) {
 				latitude = location.getLatitude();
 				longitude = location.getLongitude();
+				
+				if ( null != callback )
+					callback.performCallback();
 			}
 		};
-		locationHelper.init(this, locationResult);
+		locationHelper.init(applicationContext, locationResult);
+    }
+    
+    public static void updateLocation() {
+    	updateLocation(null);
     }
 
     @Override

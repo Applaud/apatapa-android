@@ -11,6 +11,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -85,7 +86,7 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 		return false;
 	}
 	
-	public static void serverGET(String URL, Map params) {
+	public static void serverGET(String URL, Map params, ResponseHandler handler) {
 		String fullURL = SERVER_URL + URL + GETURLFromMap(params);
 		
 		// Construct the GET request
@@ -117,24 +118,19 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 			Log.e("apatapa","Status code unaccounted for. ("+response.getStatusLine().getStatusCode()+")");
 		}
 		
-		
-		
-		// DEBUG: print out server's response as a string
-		try {
-			Log.v("apatapa","This is the stringified response entity:");
-			Log.v("apatapa",EntityUtils.toString(response.getEntity()));
-		} catch (ParseException e) {
-			Log.e("apatapa","Parse exception when trying to print json reponse.");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.e("apatapa","IOException when trying to print json reponse.");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// Handle the response
+		if ( null != handler ) {
+			try {
+				handler.handleResponse(response);
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	public static void serverPOST(String URL, Map params) {
+	public static void serverPOST(String URL, Map params, ResponseHandler handler) {
 		String csrfToken = getCSRFTokenFromURL(URL);
 		String fullURL = SERVER_URL + URL;
 		
@@ -179,20 +175,15 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 			Log.e("apatapa","Status code unaccounted for. ("+response.getStatusLine().getStatusCode()+")");
 		}
 		
-		
-		
-		// DEBUG: print out server's response as a string
-		try {
-			Log.v("apatapa","This is the stringified response entity:");
-			Log.v("apatapa",EntityUtils.toString(response.getEntity()));
-		} catch (ParseException e) {
-			Log.e("apatapa","Parse exception when trying to print json reponse.");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.e("apatapa","IOException when trying to print json reponse.");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		// Handle the response
+		if ( null != handler ) {
+			try {
+				handler.handleResponse( response );
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

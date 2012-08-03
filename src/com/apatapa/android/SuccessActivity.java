@@ -164,6 +164,9 @@ public class SuccessActivity extends Activity implements ApatapaURLDefinitions, 
 		public void onPostExecute(Void unused) {
 			loadingDialog.dismiss();
 			Log.v("verbose", "Logged into business with id of "+MainActivity.currentBusiness.getBusinessID());
+			
+			Intent tabbedIntent = new Intent(SuccessActivity.this, TabbedActivity.class); 
+			startActivity( tabbedIntent );
 		}
 		
 		public Void doInBackground(Void...voids) {

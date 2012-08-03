@@ -20,13 +20,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.apatapa.android.models.Business;
 
-public class SuccessActivity extends Activity implements ApatapaURLDefinitions {
+public class SuccessActivity extends Activity implements ApatapaURLDefinitions, OnItemClickListener {
 
 	public String[] testStrings = {"one", "two", "three", "four", "five"};
 	private ArrayList<Business> businesses;
@@ -36,9 +39,18 @@ public class SuccessActivity extends Activity implements ApatapaURLDefinitions {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login_success);
 
+		ListView businessList = (ListView)findViewById(R.id.businessListing);
+		businessList.setOnItemClickListener(this);
+		
 		new LocationsProgress().execute();
 	}
 
+	/**
+	 * LocationsProgress
+	 * 
+	 * This gives a ProgressDialog while obtaining nearby locations.
+	 *
+	 */
 	private class LocationsProgress extends AsyncTask<Void, Void, Void> {
 		ProgressDialog loadingDialog;
 
@@ -109,8 +121,8 @@ public class SuccessActivity extends Activity implements ApatapaURLDefinitions {
 									businessObject.optString("goog_id"),
 									businessObject.optDouble("latitude"),
 									businessObject.optDouble("longitude"),
-									businessObject.optString("primaryColor"),
-									businessObject.optString("secondaryColor"),
+									businessObject.optString("primary"),
+									businessObject.optString("secondary"),
 									businessObject.optBoolean("generic"),
 									businessTypes );
 
@@ -130,12 +142,75 @@ public class SuccessActivity extends Activity implements ApatapaURLDefinitions {
 			return null;
 		}
 	}
+	
+	/**
+	 * CheckinProgress
+	 * 
+	 * Displays a ProgressDialog while checking into the selected business.
+	 *
+	 */
+	private class CheckinProgress extends AsyncTask<Void, Void, Void> {
+		ProgressDialog loadingDialog;
 
+		public void onPreExecute() {
+			loadingDialog = new ProgressDialog(SuccessActivity.this);
+			loadingDialog.setTitle("Apatapa");
+			loadingDialog.setMessage("Please wait...");
+			loadingDialog.setIndeterminate(true);
+			loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			loadingDialog.show();
+		}
+		
+		public void onPostExecute(Void unused) {
+			loadingDialog.dismiss();
+			Log.v("verbose", "Logged into business with id of "+MainActivity.currentBusiness.getBusinessID());
+		}
+		
+		public Void doInBackground(Void...voids) {
+			HashMap<String,Object> params = new HashMap<String,Object>();
+			params.put("latitude", MainActivity.currentBusiness.getLatitude());
+			params.put("longitude", MainActivity.currentBusiness.getLongitude());
+			params.put("goog_id", MainActivity.currentBusiness.getGoogleID());
+			params.put("types", MainActivity.currentBusiness.getTypes());
+			params.put("name", MainActivity.currentBusiness.getName());
+			
+			ConnectionManager.serverPOST(CHECKIN_URL, params, new ResponseHandler<Void>() {
 
-	/********************************
-	 * Responses to UI Elements
-	 *******************************/
+				@Override
+				public Void handleResponse(HttpResponse response)
+						throws ClientProtocolException, IOException {
+					
+					JSONObject json = null;
+					String jsonString = null;
+					try {
+						jsonString = EntityUtils.toString(response.getEntity());
+						json = new JSONObject( jsonString );
+					} catch (ParseException e) {
+						System.err.println("This is not valid json: "+jsonString);
+						e.printStackTrace();
+					} catch (JSONException e) {
+						System.err.println("This is not valid json: "+jsonString);
+						e.printStackTrace();
+					}
+					
+					long businessID = 0;
+					try {
+						businessID = json.getLong("business_id");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					MainActivity.currentBusiness.setBusinessID(businessID);
 
+					return null;
+				}
+				
+			});
+			
+			return null;
+		}
+		
+	}
 
 	/**
 	 * loginButtonClicked
@@ -148,8 +223,21 @@ public class SuccessActivity extends Activity implements ApatapaURLDefinitions {
 			public void performCallback() {
 				System.out.println("Callback performed.");
 
-				//TODO: update the listview to show the new locations.
+				new LocationsProgress().execute();
 			}
 		});
+	}
+
+	@Override
+	/**
+	 * onItemClick
+	 * 
+	 * This gets called when the user selects a business from the ListView.
+	 */
+	public void onItemClick(AdapterView<?> listView, View v, int position, long id) {
+		Business b = businesses.get(position);
+		MainActivity.currentBusiness = b;
+		
+		new CheckinProgress().execute();
 	}
 }

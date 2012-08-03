@@ -11,4 +11,6 @@ public interface ApatapaURLDefinitions {
 	
 	// Where to download possible businesses based on location
 	public static final String WHEREAMI_URL = "/mobile/whereami/";
+	// Where to post our current business to
+	public static final String CHECKIN_URL = "/mobile/checkin/";
 }

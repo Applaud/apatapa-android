@@ -12,12 +12,16 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
+import com.apatapa.android.models.Business;
+
 public class MainActivity extends Activity implements ApatapaURLDefinitions {
 	
 	// Stored for the rest of the app to see.
 	public static double latitude, longitude;
 	// Application context
 	private static Context applicationContext;
+	// Current business that we have selected
+	public static Business currentBusiness = null;
 
 	// Used to retrieve the user's location. Results are stored
 	// statically in this class.

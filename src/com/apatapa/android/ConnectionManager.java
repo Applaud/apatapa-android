@@ -5,7 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -18,6 +21,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
@@ -73,10 +78,14 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 		// Go to the next page if we were successful logging in.
 		if (200 == response.getStatusLine().getStatusCode()) {
 			try {
-				SESSION_TOKEN = EntityUtils.toString(response.getEntity());
+				Pattern sessionPattern = Pattern.compile("sessionid=[a-f0-9]+;");
+				Header cookie = response.getHeaders("Set-Cookie")[0];
+				Matcher sessionMatcher = sessionPattern.matcher( cookie.getValue() );
+				if ( sessionMatcher.find() )
+					SESSION_TOKEN = sessionMatcher.group();
+				else
+					Log.e("ERROR","Could not grab the session token!");
 			} catch (ParseException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
@@ -138,9 +147,11 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 		HttpPost postRequest = new HttpPost(fullURL);
 		postRequest.setHeader("Accept", "application/json");
 		postRequest.setHeader("Cookie", "csrftoken="+csrfToken+"; "+SESSION_TOKEN);
+		Log.d("debug","The cookie header is this: "+postRequest.getHeaders("Cookie")[0].toString());
 		postRequest.setHeader("Content-type","application/json");
 		postRequest.setHeader("X-CSRFToken", csrfToken);
 		JSONObject json = new JSONObject( params );
+		Log.d("debug","Sending these JSONd params: "+json.toString());
 		StringEntity jsonBody = null;
 		try {
 			jsonBody = new StringEntity(json.toString(),"UTF-8");
@@ -148,6 +159,10 @@ public class ConnectionManager implements ApatapaURLDefinitions {
 			Log.e("apatapa", "Cannot encode into json.");
 			e1.printStackTrace();
 		}
+		HttpParams csrfParam = new BasicHttpParams();
+		csrfParam.setParameter("csrfmiddlewaretoken", csrfToken);
+		postRequest.setParams(csrfParam);	
+//		Log.v("debug","This is the post request you are making:"+postRequest.);
 		postRequest.setEntity(jsonBody);
 		
 		HttpResponse response = null;

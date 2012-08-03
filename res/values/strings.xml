@@ -6,8 +6,10 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="login_text">Username</string>
     <string name="password_text">Password</string>
-	<string name="login_button_text">OK</string>
-	<string name="locations_text">Available Locations</string>
-	<string name="refresh_button_text">refresh</string>
+    <string name="login_button_text">OK</string>
+    <string name="locations_text">Available Locations</string>
+    <string name="refresh_button_text">refresh</string>
+    <string name="title_activity_newsfeed">NewsfeedActivity</string>
+    <string name="title_activity_tabbed">TabbedActivity</string>
 
 </resources>

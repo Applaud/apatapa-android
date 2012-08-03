@@ -11,5 +11,7 @@
     <string name="refresh_button_text">refresh</string>
     <string name="title_activity_newsfeed">NewsfeedActivity</string>
     <string name="title_activity_tabbed">TabbedActivity</string>
+    <string name="title_activity_applaud">ApplaudActivity</string>
+    <string name="title_activity_questions">QuestionsActivity</string>
 
 </resources>

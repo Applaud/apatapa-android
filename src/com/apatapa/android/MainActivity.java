@@ -1,6 +1,7 @@
 package com.apatapa.android;
 
 
+import com.apatapa.android.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
